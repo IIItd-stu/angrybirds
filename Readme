@@ -1,0 +1,28 @@
+How the Game Works
+This game is a physics-based puzzle game where you launch birds from a catapult to destroy pigs and blocks. The goal is to eliminate all the pigs on the screen using a limited number of birds. Each bird has different abilities and hit points.  
+Controls
+Drag and Release: Click and drag the bird to aim, then release to launch.
+Pause: Click the pause button to pause the game.
+Quit: Click the quit button to exit to the level selection screen.
+Home: Click the home button on the end screen to go back to the main menu.
+Retry: Click the retry button on the end screen to restart the level.
+Game Elements
+Birds: Different types of birds with varying hit points.
+Pigs: Pigs with health points that need to be reduced to zero to be destroyed.
+Blocks: Blocks that can be destroyed by birds, affecting the pigs' health.
+Assumptions
+The game uses a physics engine to simulate realistic movements and collisions.
+Birds and pigs have health points that decrease upon collision.
+The game ends when all pigs are destroyed or all birds are used.
+The game has multiple levels, each with different layouts and challenges.
+The game includes a winning screen and a losing screen based on the player's performance.
+Installation
+Clone the repository.
+Open the project in IntelliJ IDEA.
+Run the Main class to start the game.
+Dependencies
+LibGDX: For game development.
+Box2D: For physics simulation.
+
+
+To test the project run the tests from test folder of src.
