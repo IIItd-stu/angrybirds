@@ -1,1632 +1,947 @@
 package io.github.some_example_name;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-
-public class Level_1 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private OrthographicCamera camera;
-    private Viewport viewport;
-    private Texture levelBackground;
-    private Texture catapult;
-    private Texture scr2Texture;
-    private boolean isPaused;
-    private Main mainInstance;
-
-    private Bird bird;
-    private Bird bird2;
-    private Pig pig;
-    private Object woodBlock;
-
-    private Stage stage;
-    private ImageButton pauseButton;
-    private ImageButton quitButton;
-
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
-    }
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(640, 480, camera);
-        camera.position.set(320, 240, 0);
-        viewport.apply();
-
-        levelBackground = new Texture("insidelvle2.jpg");
-        catapult = new Texture("catapult2.png");
-        scr2Texture = new Texture("scr1.png");
-
-        bird = new Bird("bird.png", 70, 70, 25, 25);
-        bird2 = new Bird("bird2.png", 120, 127, 25, 25);
-        pig = new Pig("pig.png", 510, 70, 30, 40);
-        woodBlock = new Object("wood2.png", 480, 60, 80, 70);
-
-        // Set up the stage for UI
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
-
-        // Load button textures
-        Texture pauseTexture = new Texture("pause2.png");
-        Texture quitTexture = new Texture("quit1.png");
-
-        // Create and position the pause button at the top-left
-        pauseButton = createImageButton(pauseTexture, 10, 430, 50, 50);
-        quitButton = createImageButton(quitTexture, 10, 370, 50, 50);
-        quitButton.setVisible(false);
-
-        // Set up listener for pause button click
-        pauseButton.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                isPaused = !isPaused;
-                quitButton.setVisible(isPaused); // Toggle quit button visibility on pause
-                return true;
-            }
-        });
-
-        // Set up listener for quit button click
-        quitButton.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (isPaused) {
-                    mainInstance.showLevelDisplayScreen = true;
-                    mainInstance.showLevel1 = false;
-                }
-                return true;
-            }
-        });
-
-        // Add buttons to the stage
-        stage.addActor(pauseButton);
-        stage.addActor(quitButton);
-    }
-
-    // Helper method to create ImageButton with specified size
-    private ImageButton createImageButton(Texture texture, float x, float y, float width, float height) {
-        Drawable drawable = new TextureRegionDrawable(new TextureRegion(texture));
-        ImageButton button = new ImageButton(drawable);
-        button.setSize(width, height); // Set button size
-        button.setPosition(x, y); // Set button position
-        return button;
-    }
-
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-
-        batch.begin();
-        batch.draw(levelBackground, 0, 0, 640, 480);
-        bird.render(batch);
-        bird2.render(batch);
-        pig.render(batch);
-        woodBlock.render(batch);
-
-        float catapultX = bird.getX() + bird.getWidth() + 10;
-        float catapultY = bird.getY();
-        batch.draw(catapult, catapultX, catapultY, 60, 70);
-
-        float scr2X = 640 - 60; // X position for the image (adjust width as necessary)
-        float scr2Y = 480 - 60; // Y position for the image (adjust height as necessary)
-        batch.draw(scr2Texture, scr2X, scr2Y, 50, 40); // Draw scr2.png with size 50x50
-        batch.end();
-
-        // Draw the stage with buttons
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height, true);
-        camera.update(); // Update camera after resizing
-        stage.getViewport().update(width, height, true); // Ensure stage viewport is also updated
-
-        // Reset the input processor to ensure it receives inputs correctly
-        Gdx.input.setInputProcessor(stage);
-
-        // Update button positions dynamically based on the new height
-        pauseButton.setPosition(10, height - 60); // Adjust Y position based on height
-        quitButton.setPosition(10, height - 120); // Adjust Y position based on height
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        catapult.dispose();
-        bird.dispose();
-        bird2.dispose();
-        pig.dispose();
-        woodBlock.dispose();
-        stage.dispose();
-    }
-}
-
-
-
-
-
-
-
-
-/*package io.github.some_example_name;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.badlogic.gdx.math.Vector3;
-
-public class Level_1 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private OrthographicCamera camera;    // Camera for world coordinates
-    private Viewport viewport;            // Viewport to handle resizing
-    private Texture levelBackground;
-    private Texture pauseButton;
-    private Texture quitButton;
-    private Texture settingsButton;
-    private Texture catapult;             // New catapult texture
-    private Rectangle pauseButtonBounds;
-    private Rectangle quitButtonBounds;
-    private Rectangle settingsButtonBounds;
-    private boolean isPaused;
-    private Main mainInstance;
-
-    private Bird bird;
-    private Bird bird2;
-    private Pig pig;
-    private Object woodBlock;
-
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
-    }
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-
-        // Set up camera and viewport for a 640x480 world size
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(640, 480, camera);
-        camera.position.set(320, 240, 0);  // Center the camera at (320, 240)
-        viewport.apply();
-
-        // Load textures
-        levelBackground = new Texture("insidelvle2.jpg");
-        pauseButton = new Texture("pse.png");
-        quitButton = new Texture("quit1.png");
-        settingsButton = new Texture("settings.png");
-        catapult = new Texture("catapult2.png");
-
-        // Set button bounds in world coordinates
-        pauseButtonBounds = new Rectangle(50, 430, 50, 50);   // Position near the top-left corner
-        quitButtonBounds = new Rectangle(50, 370, 50, 50);    // Position below pause button
-        settingsButtonBounds = new Rectangle(50, 310, 50, 50); // Position below quit button
-
-        isPaused = false;
-
-        // Initialize game objects with world coordinates
-        bird = new Bird("bird.png", 70, 70, 25, 25);
-        bird2 = new Bird("bird2.png", 120, 127, 25, 25);
-        pig = new Pig("pig.png", 510, 70, 30, 40);
-        woodBlock = new Object("wood2.png", 480, 60, 80, 70);
-    }
-
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // Update the camera
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-
-        batch.begin();
-        batch.draw(levelBackground, 0, 0, 640, 480); // Draw background to match viewport size
-
-        // Draw pause button
-        batch.draw(pauseButton, pauseButtonBounds.x, pauseButtonBounds.y, pauseButtonBounds.width, pauseButtonBounds.height);
-
-        // Render game objects
-        bird.render(batch);
-        bird2.render(batch);
-        pig.render(batch);
-        woodBlock.render(batch);
-
-        // Draw the catapult next to the bird
-        float catapultX = bird.getX() + bird.getWidth() + 10; // Position catapult near bird
-        float catapultY = bird.getY();
-        batch.draw(catapult, catapultX, catapultY, 60, 70);
-
-        if (isPaused) {
-            // Draw quit and settings buttons if paused
-            batch.draw(quitButton, quitButtonBounds.x, quitButtonBounds.y, quitButtonBounds.width, quitButtonBounds.height);
-            batch.draw(settingsButton, settingsButtonBounds.x, settingsButtonBounds.y, settingsButtonBounds.width, settingsButtonBounds.height);
-        }
-
-        batch.end();
-
-        if (Gdx.input.isTouched()) {
-            // Convert screen coordinates to world coordinates
-            float touchX = viewport.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0)).x;
-            float touchY = viewport.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0)).y;
-
-            if (pauseButtonBounds.contains(touchX, touchY)) {
-                isPaused = !isPaused;  // Toggle pause state
-            }
-
-            if (isPaused && quitButtonBounds.contains(touchX, touchY)) {
-                mainInstance.showLevelDisplayScreen = true; // Go back to level select
-                mainInstance.showLevel1 = false; // Exit Level_1
-            }
-        }
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height); // Update viewport to handle resizing
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        pauseButton.dispose();
-        quitButton.dispose();
-        settingsButton.dispose();
-        catapult.dispose();
-        bird.dispose();
-        bird2.dispose();
-        pig.dispose();
-        woodBlock.dispose();
-    }
-}
-
-
-
-
-
-/*
-package io.github.some_example_name;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-
-public class Level_1 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private OrthographicCamera camera;
-    private Viewport viewport;
-    private Texture levelBackground;
-    private Texture catapult;
-    private boolean isPaused;
-    private Main mainInstance;
-
-    private Bird bird;
-    private Bird bird2;
-    private Pig pig;
-    private Object woodBlock;
-
-    private Stage stage;
-    private ImageButton pauseButton;
-    private ImageButton quitButton;
-
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
-    }
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(640, 480, camera);
-        camera.position.set(320, 240, 0);
-        viewport.apply();
-
-        levelBackground = new Texture("insidelvle2.jpg");
-        catapult = new Texture("catapult2.png");
-
-        bird = new Bird("bird.png", 70, 70, 25, 25);
-        bird2 = new Bird("bird2.png", 120, 127, 25, 25);
-        pig = new Pig("pig.png", 510, 70, 30, 40);
-        woodBlock = new Object("wood2.png", 480, 60, 80, 70);
-
-        // Set up the stage for UI
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
-
-        // Load button textures
-        Texture pauseTexture = new Texture("pause2.png");
-        Texture quitTexture = new Texture("quit1.png");
-
-        // Create and position the pause button at the top-left
-        pauseButton = createImageButton(pauseTexture, 10, 430, 50, 50);
-        quitButton = createImageButton(quitTexture, 10, 370, 50, 50);
-        quitButton.setVisible(false);
-
-        // Set up listener for pause button click
-        pauseButton.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                isPaused = !isPaused;
-                quitButton.setVisible(isPaused); // Toggle quit button visibility on pause
-                return true;
-            }
-        });
-
-        // Set up listener for quit button click
-        quitButton.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (isPaused) {
-                    mainInstance.showLevelDisplayScreen = true;
-                    mainInstance.showLevel1 = false;
-                }
-                return true;
-            }
-        });
-
-        // Add buttons to the stage
-        stage.addActor(pauseButton);
-        stage.addActor(quitButton);
-    }
-
-    // Helper method to create ImageButton with specified size
-    private ImageButton createImageButton(Texture texture, float x, float y, float width, float height) {
-        Drawable drawable = new TextureRegionDrawable(new TextureRegion(texture));
-        ImageButton button = new ImageButton(drawable);
-        button.setSize(width, height); // Set button size
-        button.setPosition(x, y); // Set button position
-        return button;
-    }
-
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-
-        batch.begin();
-        batch.draw(levelBackground, 0, 0, 640, 480);
-        bird.render(batch);
-        bird2.render(batch);
-        pig.render(batch);
-        woodBlock.render(batch);
-
-        float catapultX = bird.getX() + bird.getWidth() + 10;
-        float catapultY = bird.getY();
-        batch.draw(catapult, catapultX, catapultY, 60, 70);
-        batch.end();
-
-        // Draw the stage with buttons
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height);
-        stage.getViewport().update(width, height, true); // Ensure stage updates correctly
-
-        // Reset input processor to ensure it receives inputs correctly
-        Gdx.input.setInputProcessor(stage);
-
-        // Update button positions dynamically based on height
-        pauseButton.setPosition(10, height - 60); // Adjust Y position based on height
-        quitButton.setPosition(10, height - 120); // Adjust Y position based on height
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        catapult.dispose();
-        bird.dispose();
-        bird2.dispose();
-        pig.dispose();
-        woodBlock.dispose();
-        stage.dispose();
-    }
-}
-
-
-
-
-/*
-package io.github.some_example_name;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
-public class Level_1 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private OrthographicCamera camera;
-    private Viewport viewport;
-    private Texture levelBackground;
-    private Texture catapult;
-    private boolean isPaused;
-    private Main mainInstance;
-
-    private Bird bird;
-    private Bird bird2;
-    private Pig pig;
-    private Object woodBlock;
-
-    private Stage stage;
-    private ImageButton pauseButton;
-    private ImageButton quitButton;
-    private ImageButton settingsButton;
-
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
-    }
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(640, 480, camera);
-        camera.position.set(320, 240, 0);
-        viewport.apply();
-
-        levelBackground = new Texture("insidelvle2.jpg");
-        catapult = new Texture("catapult2.png");
-
-        bird = new Bird("bird.png", 70, 70, 25, 25);
-        bird2 = new Bird("bird2.png", 120, 127, 25, 25);
-        pig = new Pig("pig.png", 510, 70, 30, 40);
-        woodBlock = new Object("wood2.png", 480, 60, 80, 70);
-
-        // Set up the stage for UI
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage); // Set input processor to the stage
-
-        // Load button textures
-        Texture pauseTexture = new Texture("pause2.png");
-        Texture quitTexture = new Texture("quit1.png");
-        Texture settingsTexture = new Texture("settings.png");
-
-        // Create ImageButtons
-        pauseButton = createImageButton(pauseTexture, 50, 430);
-        quitButton = createImageButton(quitTexture, 50, 370);
-        settingsButton = createImageButton(settingsTexture,  50, 310);
-
-        // Add listeners to handle clicks
-        pauseButton.addListener(event -> {
-            isPaused = !isPaused;
-            return true;
-        });
-
-        quitButton.addListener(event -> {
-            if (isPaused) {
-                mainInstance.showLevelDisplayScreen = true;
-                mainInstance.showLevel1 = false;
-            }
-            return true;
-        });
-
-        // Add buttons to stage
-        stage.addActor(pauseButton);
-        stage.addActor(quitButton);
-        stage.addActor(settingsButton);
-    }
-
-    // Helper method to create ImageButton
-    private ImageButton createImageButton(Texture texture, float x, float y) {
-        Drawable drawable = new TextureRegionDrawable(new TextureRegion(texture));
-        ImageButton button = new ImageButton(drawable);
-        button.setPosition(x,y);
-        button.setSize(50,50);
-        return button;
-    }
-
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-
-        batch.begin();
-        batch.draw(levelBackground, 0, 0, 640, 480);
-        bird.render(batch);
-        bird2.render(batch);
-        pig.render(batch);
-        woodBlock.render(batch);
-
-        float catapultX = bird.getX() + bird.getWidth() + 10;
-        float catapultY = bird.getY();
-        batch.draw(catapult, catapultX, catapultY, 60, 70);
-        batch.end();
-
-        // Draw the stage with buttons
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height);
-        stage.getViewport().update(width, height, true);
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        catapult.dispose();
-        bird.dispose();
-        bird2.dispose();
-        pig.dispose();
-        woodBlock.dispose();
-        stage.dispose();
-    }
-}
-
-
-
-
-/*
-package io.github.some_example_name;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.math.Vector3;
 
-public class Level_1 extends ApplicationAdapter {
+public class Level_1 {
+    private Main game;
     private SpriteBatch batch;
-    private OrthographicCamera camera;    // Camera for world coordinates
-    private Viewport viewport;            // Viewport to handle resizing
-    private Texture levelBackground;
-    private Texture pauseButton;
-    private Texture quitButton;
-    private Texture settingsButton;
-    private Texture catapult;             // New catapult texture
+    private ShapeRenderer shapeRenderer;
+
+    private static final float PPM = 100f; // Pixels per meter
+    private final float WORLD_WIDTH = Gdx.graphics.getWidth() / PPM;
+    private final float WORLD_HEIGHT = Gdx.graphics.getHeight() / PPM;
+
+    private World world;
+    private Box2DDebugRenderer debugRenderer;
+    private Array<Body> bodiesToDestroy;
+
+    private Texture backgroundTexture;
+    private Texture catapultTexture;
+    private Texture birdTexture;
+    private Texture bird2Texture;
+    private Texture blockTexture;
+    private Texture blockHorizontalTexture;
+
+    private Texture pauseButtonTexture;
+    private Texture quitButtonTexture;
     private Rectangle pauseButtonBounds;
     private Rectangle quitButtonBounds;
-    private Rectangle settingsButtonBounds;
     private boolean isPaused;
-    private Main mainInstance;
+    private boolean showQuitButton;
 
-    private Bird bird;
-    private Bird bird2;
-    private Pig pig;
-    private Object woodBlock;
+    private Texture homeButtonTexture;
+    private Texture playAgainButtonTexture;
+    private Rectangle homeButtonBounds;
+    private Rectangle playAgainButtonBounds;
 
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
+    private Body groundBody;
+    private Body[] birdBodies = new Body[3];
+    private Body blockBody;
+    private Body[] blockBodies = new Body[3];
+
+    private int currentBirdIndex = 0;
+    private boolean isDragging = false;
+    private Vector2 rubberEnd = new Vector2();
+
+    private final float GROUND_Y = 65f / PPM;
+    private final Vector2 catapultPosition = new Vector2(100f / PPM, GROUND_Y + 40f / PPM);
+    private final float DRAG_RADIUS = 40f / PPM;
+    private final float TIME_STEP = 1/60f;
+    private final int VELOCITY_ITERATIONS = 6;
+    private final int POSITION_ITERATIONS = 3;
+
+    private boolean birdLaunched = false;
+    private float launchTimer = 0;
+    private static final float RESET_TIME = 2f;
+
+    // Pig related
+    private Body pigBody;
+    private Texture pigTexture;
+    private boolean showEndScreen = false;
+
+    private boolean showWinningScreen = false;
+    private boolean showLosingScreen = false;
+    private Texture winningScreenTexture;
+    private Texture losingScreenTexture;
+
+    private float winningScreenDelayTimer = 0;
+    private static final float WINNING_SCREEN_DELAY = 2f;
+
+    private BitmapFont scoreFont;
+    private int score = 0;
+
+    public Level_1(Main game) {
+        this.game = game;
     }
 
-    @Override
     public void create() {
-        batch = new SpriteBatch();
+        if (batch == null) {
+            batch = new SpriteBatch();
+            shapeRenderer = new ShapeRenderer();
 
-        // Set up camera and viewport for a 640x480 world size
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(640, 480, camera);
-        camera.position.set(320, 240, 0);  // Center the camera at (320, 240)
-        viewport.apply();
+            // Load textures only if they haven't been loaded
+            backgroundTexture = new Texture("insidelvle2.jpg");
+            catapultTexture = new Texture("catapult2.png");
+            bird2Texture = new Texture("bird2.png");
+            blockTexture = new Texture("wb1.png");
+            blockHorizontalTexture = new Texture("wbh.png");
+            pauseButtonTexture = new Texture("pse.png");
+            quitButtonTexture = new Texture("quit1.png");
+            pigTexture = new Texture("pig.png");
+            winningScreenTexture = new Texture("winning.png");
+            losingScreenTexture = new Texture("losing.png");
+            homeButtonTexture = new Texture("home.png");
+            playAgainButtonTexture = new Texture("retry.png");
+        }
 
-        // Load textures
-        levelBackground = new Texture("insidelvle2.jpg");
-        pauseButton = new Texture("pause2.png");
-        quitButton = new Texture("quit1.png");
-        settingsButton = new Texture("settings.png");
-        catapult = new Texture("catapult2.png");
+        bodiesToDestroy = new Array<>();
 
-        // Set button bounds in world coordinates
-        pauseButtonBounds = new Rectangle(50, 430, 50, 50);   // Position near the top-left corner
-        quitButtonBounds = new Rectangle(50, 370, 50, 50);    // Position below pause button
-        settingsButtonBounds = new Rectangle(50, 310, 50, 50); // Position below quit button
+        // Position buttons
+        pauseButtonBounds = new Rectangle(10, Gdx.graphics.getHeight() - 60, 50, 50);
+        quitButtonBounds = new Rectangle(10, Gdx.graphics.getHeight() - 120, 50, 50);
+        homeButtonBounds = new Rectangle(200, 100, 100, 100);
+        playAgainButtonBounds = new Rectangle(350, 100, 100, 100);
 
+        scoreFont = new BitmapFont();
+        scoreFont.getData().setScale(2f);
+        scoreFont.setColor(Color.WHITE);
+
+        // Create physics world
+        world = new World(new Vector2(0, -10f), true);
+        debugRenderer = new Box2DDebugRenderer();
+        world.setContactListener(createContactListener());
+
+        // Create game objects
+        createGround();
+        createBirds();
+        createPig();
+        createBlocks();
+
+        // Reset game state
         isPaused = false;
-
-        // Initialize game objects with world coordinates
-        bird = new Bird("bird.png", 70, 70, 25, 25);
-        bird2 = new Bird("bird2.png", 120, 127, 25, 25);
-        pig = new Pig("pig.png", 510, 70, 30, 40);
-        woodBlock = new Object("wood2.png", 480, 60, 80, 70);
+        showQuitButton = false;
+        currentBirdIndex = 0;
+        isDragging = false;
+        birdLaunched = false;
+        launchTimer = 0;
     }
 
-    @Override
+
+    private ContactListener createContactListener() {
+        return new ContactListener() {
+            @Override
+            public void beginContact(Contact contact) {
+                Body bodyA = contact.getFixtureA().getBody();
+                Body bodyB = contact.getFixtureB().getBody();
+
+                Object userDataA = contact.getFixtureA().getUserData();
+                Object userDataB = contact.getFixtureB().getUserData();
+
+                float relativeVelocity = contact.getWorldManifold().getNormal().dot(
+                    bodyA.getLinearVelocity().cpy().sub(bodyB.getLinearVelocity())
+                );
+
+                // Always check birds first
+
+
+                // Handle pigs and blocks with health reduction
+                if (Math.abs(relativeVelocity) > 5f) {
+
+                    if (userDataA != null && userDataA instanceof Bird) {
+                        // Always destroy the bird
+                        if (!bodiesToDestroy.contains(bodyA, true)) {
+                            bodiesToDestroy.add(bodyA);
+                        }
+                    }
+                    if (userDataB != null && userDataB instanceof Bird) {
+                        // Always destroy the bird
+                        if (!bodiesToDestroy.contains(bodyB, true)) {
+                            bodiesToDestroy.add(bodyB);
+                        }
+                    }
+
+                    // Check and reduce health for pigs
+                    if (userDataA instanceof Pig) {
+                        Pig pig = (Pig)userDataA;
+                        Bird bird = (Bird)userDataB;
+                        pig.setHealth(pig.getHealth() - bird.getHitPoint());
+                        if (pig.getHealth() <= 0 && !bodiesToDestroy.contains(bodyA, true)) {
+                            bodiesToDestroy.add(bodyA);
+                        }
+                    }
+                    if (userDataB instanceof Pig) {
+                        Pig pig = (Pig)userDataB;
+                        Bird bird = (Bird)userDataA;
+                        pig.setHealth(pig.getHealth() - bird.getHitPoint());
+                        if (pig.getHealth() <= 0 && !bodiesToDestroy.contains(bodyB, true)) {
+                            bodiesToDestroy.add(bodyB);
+                        }
+                    }
+
+                    // Check and reduce health for blocks
+                    if (userDataA instanceof Block) {
+                        Block block = (Block)userDataA;
+                        Bird    bird = (Bird)userDataB;
+                        block.setHealth(block.getHealth() - bird.getHitPoint());
+                        if (block.getHealth() <= 0 && !bodiesToDestroy.contains(bodyA, true)) {
+                            bodiesToDestroy.add(bodyA);
+                        }
+                    }
+                    if (userDataB instanceof Block) {
+                        Block block = (Block)userDataB;
+                        Bird bird = (Bird)userDataA;
+                        block.setHealth(block.getHealth() - bird.getHitPoint());
+                        if (block.getHealth() <= 0 && !bodiesToDestroy.contains(bodyB, true)) {
+                            bodiesToDestroy.add(bodyB);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void endContact(Contact contact) {}
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) {}
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) {}
+        };
+    }
+
+    private void handleRemainingBirdsAndScore() {
+        // Destroy remaining birds and add 500 points for each
+        for (int i = currentBirdIndex; i < birdBodies.length; i++) {
+            if (birdBodies[i] != null) {
+                bodiesToDestroy.add(birdBodies[i]);
+                birdBodies[i] = null;
+                score += 500;
+            }
+        }
+
+        // Check if all pigs are destroyed
+        if (pigBody == null) {
+            showWinningScreen = true;
+        } else {
+            showLosingScreen = true;
+        }
+        isPaused = true; // Stop the game
+    }
+
+    private void createGround() {
+        BodyDef groundDef = new BodyDef();
+        groundDef.type = BodyDef.BodyType.StaticBody;
+        groundDef.position.set(WORLD_WIDTH / 2, GROUND_Y / 2);
+
+        groundBody = world.createBody(groundDef);
+
+        PolygonShape groundShape = new PolygonShape();
+        groundShape.setAsBox(WORLD_WIDTH / 2, GROUND_Y / 2);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = groundShape;
+        fixtureDef.friction = 0.2f;
+        fixtureDef.restitution = 0.1f;
+
+        groundBody.createFixture(fixtureDef);
+        groundShape.dispose();
+    }
+
+    private void createPig() {
+        Pig pig1 = new Pig(world, "pig.png", 1);
+        pigBody = pig1.createBody(new Vector2(490f / PPM, GROUND_Y + 40f / PPM));
+        pigBody.getFixtureList().first().setUserData(pig1);
+    }
+
+
+
+    private void createBirds() {
+        float birdSpacing = 40f / PPM;
+
+        Bird bird1 = new Bird(world, catapultPosition, "bird.png", 1);
+        Body bird1Body = bird1.createBody(new Vector2(0, 0), catapultPosition, 0, birdSpacing);
+        birdBodies[0] = bird1Body;
+        birdBodies[0].getFixtureList().first().setUserData(bird1);
+
+        Bird bird2 = new Bird(world, catapultPosition, "bird2.png", 1);
+        Body bird2Body= bird2.createBody(new Vector2(0, 0), catapultPosition, 1, birdSpacing);
+        birdBodies[1] = bird2Body;
+        birdBodies[1].getFixtureList().first().setUserData(bird2);
+
+        Bird bird3 = new Bird(world, catapultPosition, "bird.png", 1);
+        Body bird3Body = bird3.createBody(new Vector2(0, 0), catapultPosition, 2, birdSpacing);
+        birdBodies[2] = bird3Body;
+        birdBodies[2].getFixtureList().first().setUserData(bird3);
+    }
+
+    private void createBlocks() {
+        Block block1 = new Block(world, "wb1.png", 2);
+        blockBodies[0] = block1.createBodyVertical(new Vector2(470f / PPM, GROUND_Y + 40f / PPM));
+        blockBodies[0].getFixtureList().first().setUserData(block1);
+
+        Block block2 = new Block(world, "wb1.png", 2);
+        blockBodies[1] = block2.createBodyVertical(new Vector2(510f / PPM, GROUND_Y + 40f / PPM));
+        blockBodies[1].getFixtureList().first().setUserData(block2);
+
+
+        Block block3 = new Block(world, "wbh.png", 2);
+        blockBodies[2] = block3.createBodyHorizontal(new Vector2(490f / PPM, GROUND_Y + 80f / PPM));
+        blockBodies[2].getFixtureList().first().setUserData(block3);
+    }
+
+
     public void render() {
+        handlePauseInput();
+
+        if (!isPaused) {
+            updatePhysics();
+        }
+
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Update the camera
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-
+        batch.setProjectionMatrix(game.camera.combined);
         batch.begin();
-        batch.draw(levelBackground, 0, 0, 640, 480); // Draw background to match viewport size
 
-        // Draw pause button
-        batch.draw(pauseButton, pauseButtonBounds.x, pauseButtonBounds.y, pauseButtonBounds.width, pauseButtonBounds.height);
-
-        // Render game objects
-        bird.render(batch);
-        bird2.render(batch);
-        pig.render(batch);
-        woodBlock.render(batch);
-
-        // Draw the catapult next to the bird
-        float catapultX = bird.getX() + bird.getWidth() + 10; // Position catapult near bird
-        float catapultY = bird.getY();
-        batch.draw(catapult, catapultX, catapultY, 60, 70);
-
-        if (isPaused) {
-            // Draw quit and settings buttons if paused
-            batch.draw(quitButton, quitButtonBounds.x, quitButtonBounds.y, quitButtonBounds.width, quitButtonBounds.height);
-            batch.draw(settingsButton, settingsButtonBounds.x, settingsButtonBounds.y, settingsButtonBounds.width, settingsButtonBounds.height);
+        if (showWinningScreen) {
+            batch.draw(winningScreenTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.draw(homeButtonTexture, homeButtonBounds.x, homeButtonBounds.y, homeButtonBounds.width, homeButtonBounds.height);
+            batch.draw(playAgainButtonTexture, playAgainButtonBounds.x, playAgainButtonBounds.y, playAgainButtonBounds.width, playAgainButtonBounds.height);
+            batch.end();
+            handleEndScreenInput();
+            return;
         }
+
+        if (showLosingScreen) {
+            batch.draw(losingScreenTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.draw(homeButtonTexture, homeButtonBounds.x, homeButtonBounds.y, homeButtonBounds.width, homeButtonBounds.height);
+            batch.draw(playAgainButtonTexture, playAgainButtonBounds.x, playAgainButtonBounds.y, playAgainButtonBounds.width, playAgainButtonBounds.height);
+            batch.end();
+            handleEndScreenInput();
+            return;
+        }
+
+        // Existing rendering logic for the game
+        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(catapultTexture, catapultPosition.x * PPM - 40, catapultPosition.y * PPM - 40, 80, 80);
+
+        // Draw birds
+        for (int i = 0; i < birdBodies.length; i++) {
+            if (birdBodies[i] != null && !bodiesToDestroy.contains(birdBodies[i], true)) {
+                Texture birdTex = bird2Texture;
+                Body birdBody = birdBodies[i];
+
+                float birdX = birdBody.getPosition().x * PPM - 12.5f;
+                float birdY = birdBody.getPosition().y * PPM - 12.5f;
+                float rotation = (float) Math.toDegrees(birdBody.getAngle());
+
+                batch.draw(birdTex,
+                    birdX, birdY,
+                    12.5f, 12.5f,
+                    25, 25,
+                    1, 1,
+                    rotation,
+                    0, 0,
+                    birdTex.getWidth(), birdTex.getHeight(),
+                    false, false);
+            }
+        }
+
+//         Draw blocks
+        for (Body blockBody : blockBodies) {
+            if (blockBody != null && !bodiesToDestroy.contains(blockBody, true)) {
+                Texture blockTex = (blockBody == blockBodies[2]) ? blockHorizontalTexture : blockTexture;
+                float blockX = blockBody.getPosition().x * PPM - (blockBody == blockBodies[2] ? 40 : 10);
+                float blockY = blockBody.getPosition().y * PPM - (blockBody == blockBodies[2] ? 10 : 40);
+                float rotation = (float) Math.toDegrees(blockBody.getAngle());
+
+                batch.draw(blockTex,
+                    blockX, blockY,
+                    (blockBody == blockBodies[2] ? 40 : 10), (blockBody == blockBodies[2] ? 10 : 40),
+                    (blockBody == blockBodies[2] ? 80 : 20), (blockBody == blockBodies[2] ? 20 : 80),
+                    1, 1,
+                    rotation,
+                    0, 0,
+                    blockTex.getWidth(), blockTex.getHeight(),
+                    false, false);
+            }
+        }
+
+
+        // Draw pigs
+        if (pigBody != null && !bodiesToDestroy.contains(pigBody, true)) {
+            float pigX = pigBody.getPosition().x * PPM - 15f;
+            float pigY = pigBody.getPosition().y * PPM - 15f;
+            float rotation = (float) Math.toDegrees(pigBody.getAngle());
+
+            batch.draw(pigTexture,
+                pigX, pigY,
+                15f, 15f,
+                30, 30,
+                1, 1,
+                rotation,
+                0, 0,
+                pigTexture.getWidth(), pigTexture.getHeight(),
+                false, false);
+        }
+
+        batch.draw(pauseButtonTexture,
+            pauseButtonBounds.x,
+            pauseButtonBounds.y,
+            pauseButtonBounds.width,
+            pauseButtonBounds.height
+        );
+
+        if (showQuitButton) {
+            batch.draw(quitButtonTexture,
+                quitButtonBounds.x,
+                quitButtonBounds.y,
+                quitButtonBounds.width,
+                quitButtonBounds.height
+            );
+        }
+
+        // Draw score
+        scoreFont.draw(batch, "Score: " + score, Gdx.graphics.getWidth() - 170, Gdx.graphics.getHeight() - 10);
 
         batch.end();
 
-        // Check if the screen was just touched
+        if (isDragging && !showEndScreen) {
+            shapeRenderer.setProjectionMatrix(game.camera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(Color.BROWN);
+
+            // Calculate rubber band start position (0.25f above catapult)
+            Vector2 rubberStart = new Vector2(
+                catapultPosition.x,
+                catapultPosition.y + 0.25f
+            );
+
+            // Calculate the rubber band stretch factor based on distance from the raised position
+            Vector2 dragVector = new Vector2(
+                rubberEnd.x - rubberStart.x,
+                rubberEnd.y - rubberStart.y
+            );
+            float stretchDistance = dragVector.len();
+            float stretchFactor = 1 + (stretchDistance / 100f);
+
+            // Calculate the width of the rubber band based on stretch
+            float rubberWidth = 5 * stretchFactor;
+
+            // Draw the rubber band with variable width from the raised position
+            shapeRenderer.rectLine(
+                rubberStart.x * PPM,
+                rubberStart.y * PPM,
+                rubberEnd.x * PPM,
+                rubberEnd.y * PPM,
+                rubberWidth
+            );
+            shapeRenderer.end();
+        }
+
+        if (isDragging && !showEndScreen) {
+            drawTrajectoryPrediction();
+        }
+
+        if (!isPaused && !showEndScreen) {
+            handleInput();
+        }
+    }
+
+//    public void render() {
+//        handlePauseInput();
+//
+//        if (!isPaused) {
+//            updatePhysics();
+//        }
+//
+//        Gdx.gl.glClearColor(0, 0, 0, 1);
+//        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+//
+//        batch.setProjectionMatrix(game.camera.combined);
+//        batch.begin();
+//
+//        if (showWinningScreen) {
+//            batch.draw(winningScreenTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//            batch.draw(homeButtonTexture, homeButtonBounds.x, homeButtonBounds.y, homeButtonBounds.width, homeButtonBounds.height);
+//            batch.draw(playAgainButtonTexture, playAgainButtonBounds.x, playAgainButtonBounds.y, playAgainButtonBounds.width, playAgainButtonBounds.height);
+//            batch.end();
+//            handleEndScreenInput();
+//            return;
+//        }
+//
+//        if (showLosingScreen) {
+//            batch.draw(losingScreenTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//            batch.draw(homeButtonTexture, homeButtonBounds.x, homeButtonBounds.y, homeButtonBounds.width, homeButtonBounds.height);
+//            batch.draw(playAgainButtonTexture, playAgainButtonBounds.x, playAgainButtonBounds.y, playAgainButtonBounds.width, playAgainButtonBounds.height);
+//            batch.end();
+//            handleEndScreenInput();
+//            return;
+//        }
+//
+//        // Existing rendering logic for the game
+//        batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//        batch.draw(catapultTexture, catapultPosition.x * PPM - 40, catapultPosition.y * PPM - 40, 80, 80);
+//
+////         Draw birds
+//        for (int i = 0; i < birdBodies.length; i++) {
+//            if (birdBodies[i] != null && !bodiesToDestroy.contains(birdBodies[i], true)) {
+//                Texture birdTex = bird2Texture;
+//                Body birdBody = birdBodies[i];
+//
+//                float birdX = birdBody.getPosition().x * PPM - 12.5f;
+//                float birdY = birdBody.getPosition().y * PPM - 12.5f;
+//                float rotation = (float) Math.toDegrees(birdBody.getAngle());
+//
+//                batch.draw(birdTex,
+//                    birdX, birdY,
+//                    12.5f, 12.5f,
+//                    25, 25,
+//                    1, 1,
+//                    rotation,
+//                    0, 0,
+//                    birdTex.getWidth(), birdTex.getHeight(),
+//                    false, false);
+//            }
+//        }
+//
+//
+//        // Draw blocks
+//        for (Body blockBody : blockBodies) {
+//            if (blockBody != null && !bodiesToDestroy.contains(blockBody, true)) {
+//                Texture blockTex = (blockBody == blockBodies[2]) ? blockHorizontalTexture : blockTexture;
+//                float blockX = blockBody.getPosition().x * PPM - (blockBody == blockBodies[2] ? 40 : 10);
+//                float blockY = blockBody.getPosition().y * PPM - (blockBody == blockBodies[2] ? 10 : 40);
+//                float rotation = (float) Math.toDegrees(blockBody.getAngle());
+//
+//                batch.draw(blockTex,
+//                    blockX, blockY,
+//                    (blockBody == blockBodies[2] ? 40 : 10), (blockBody == blockBodies[2] ? 10 : 40),
+//                    (blockBody == blockBodies[2] ? 80 : 20), (blockBody == blockBodies[2] ? 20 : 80),
+//                    1, 1,
+//                    rotation,
+//                    0, 0,
+//                    blockTex.getWidth(), blockTex.getHeight(),
+//                    false, false);
+//            }
+//        }
+//
+//        // Draw pig
+//        if (pigBody != null && !bodiesToDestroy.contains(pigBody, true)) {
+//            float pigX = pigBody.getPosition().x * PPM - 15f;
+//            float pigY = pigBody.getPosition().y * PPM - 15f;
+//            float rotation = (float) Math.toDegrees(pigBody.getAngle());
+//
+//            batch.draw(pigTexture,
+//                pigX, pigY,
+//                15f, 15f,
+//                30, 30,
+//                1, 1,
+//                rotation,
+//                0, 0,
+//                pigTexture.getWidth(), pigTexture.getHeight(),
+//                false, false);
+//        }
+//
+//        // Draw UI elements
+//        batch.draw(pauseButtonTexture,
+//            pauseButtonBounds.x,
+//            pauseButtonBounds.y,
+//            pauseButtonBounds.width,
+//            pauseButtonBounds.height
+//        );
+//
+//        if (showQuitButton) {
+//            batch.draw(quitButtonTexture,
+//                quitButtonBounds.x,
+//                quitButtonBounds.y,
+//                quitButtonBounds.width,
+//                quitButtonBounds.height
+//            );
+//        }
+//
+//        // Draw score
+//        scoreFont.draw(batch, "Score: " + score, Gdx.graphics.getWidth() - 170, Gdx.graphics.getHeight() - 10);
+//
+//        batch.end();
+//
+//        if (isDragging && !showEndScreen) {
+//            shapeRenderer.setProjectionMatrix(game.camera.combined);
+//            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+//            shapeRenderer.setColor(Color.BROWN);
+//
+//            // Calculate rubber band start position (0.25f above catapult)
+//            Vector2 rubberStart = new Vector2(
+//                catapultPosition.x,
+//                catapultPosition.y + 0.25f
+//            );
+//
+//            // Calculate the rubber band stretch factor based on distance from the raised position
+//            Vector2 dragVector = new Vector2(
+//                rubberEnd.x - rubberStart.x,
+//                rubberEnd.y - rubberStart.y
+//            );
+//            float stretchDistance = dragVector.len();
+//            float stretchFactor = 1 + (stretchDistance / 100f);
+//
+//            // Calculate the width of the rubber band based on stretch
+//            float rubberWidth = 5 * stretchFactor;
+//
+//            // Draw the rubber band with variable width from the raised position
+//            shapeRenderer.rectLine(
+//                rubberStart.x * PPM,
+//                rubberStart.y * PPM,
+//                rubberEnd.x * PPM,
+//                rubberEnd.y * PPM,
+//                rubberWidth
+//            );
+//            shapeRenderer.end();
+//        }
+//
+//        if (isDragging && !showEndScreen) {
+//            drawTrajectoryPrediction();
+//        }
+//
+//        if (!isPaused && !showEndScreen) {
+//            handleInput();
+//        }
+//    }
+
+    private void handleEndScreenInput() {
         if (Gdx.input.justTouched()) {
-            Vector2 touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-            viewport.unproject(touchPos); // Convert screen coordinates to world coordinates
+            Vector3 touch = game.viewport.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-            // Check if the touch is within the pause button bounds
-            if (pauseButtonBounds.contains(touchPos.x, touchPos.y)) {
-                isPaused = !isPaused;  // Toggle pause state
-                System.out.println("Pause button clicked!");
-            }
+            if (homeButtonBounds.contains(touch.x, touch.y)) {
+                // Properly dispose of current level resources
+                dispose();
 
-            // If paused, check quit button for level selection screen
-            if (isPaused && quitButtonBounds.contains(touchPos.x, touchPos.y)) {
-                mainInstance.showLevelDisplayScreen = true; // Go back to level select
-                mainInstance.showLevel1 = false; // Exit Level_1
+
+                game.currentLevel = 0;
+                game.showLevelDisplayScreen = true;
+
+                // Create a new Level_1 instance if needed
+                if (game.level_1 != null) {
+                    game.level_1 = new Level_1(game);
+                }
+            } else if (playAgainButtonBounds.contains(touch.x, touch.y)) {
+                // Reset the level fully
+                dispose(); // Dispose current resources
+                game.level_1 = new Level_1(game); // Create a new instance
+                game.level_1.create(); // Reinitialize resources
+                game.currentLevel = 1; // Set the current level
             }
         }
     }
 
+    private void updatePhysics() {
+        world.step(TIME_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height);
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        pauseButton.dispose();
-        quitButton.dispose();
-        settingsButton.dispose();
-        catapult.dispose();
-        bird.dispose();
-        bird2.dispose();
-        pig.dispose();
-        woodBlock.dispose();
-    }
-}
+        // Clean up destroyed bodies
+        Array<Body> bodiesToRemove = new Array<>();
+        for (Body body : bodiesToDestroy) {
+            if (body != null) {
+                bodiesToRemove.add(body);
 
 
+                    if (body == pigBody) {
+                        pigBody = null;
+                    }
 
 
+                for (int i = 0; i < blockBodies.length; i++) {
+                    if (body == blockBodies[i]) {
+                        blockBodies[i] = null;
+                    }
+                }
 
-/*package io.github.some_example_name;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.badlogic.gdx.math.Vector3;
-
-public class Level_1 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private OrthographicCamera camera;
-    private Viewport viewport;
-    private Texture levelBackground;
-    private Texture pauseButton;
-    private Texture quitButton;
-    private Texture settingsButton;
-    private Texture catapult;
-    private Rectangle pauseButtonBounds;
-    private Rectangle quitButtonBounds;
-    private Rectangle settingsButtonBounds;
-    private boolean isPaused;
-    private Main mainInstance;
-
-    private Bird bird;
-    private Bird bird2;
-    private Pig pig;
-    private Object woodBlock;
-
-    private Vector3 touchPoint;  // Store touch coordinates
-
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
-    }
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-
-        // Set up camera and viewport for a 640x480 world size
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(640, 480, camera);
-        camera.position.set(320, 240, 0);  // Center the camera at (320, 240)
-        viewport.apply();
-
-        // Load textures
-        levelBackground = new Texture("insidelvle2.jpg");
-        pauseButton = new Texture("pause2.png");
-        quitButton = new Texture("quit1.png");
-        settingsButton = new Texture("settings.png");
-        catapult = new Texture("catapult2.png");
-
-        // Set button bounds in world coordinates
-        pauseButtonBounds = new Rectangle(50, 430, 50, 50);   // Position near the top-left corner
-        quitButtonBounds = new Rectangle(50, 370, 50, 50);    // Position below pause button
-        settingsButtonBounds = new Rectangle(50, 310, 50, 50); // Position below quit button
-
-        isPaused = false;
-
-        // Initialize game objects with world coordinates
-        bird = new Bird("bird.png", 70, 70, 25, 25);
-        bird2 = new Bird("bird2.png", 120, 127, 25, 25);
-        pig = new Pig("pig.png", 510, 70, 30, 40);
-        woodBlock = new Object("wood2.png", 480, 60, 80, 70);
-
-        touchPoint = new Vector3();  // Initialize touchPoint for reuse
-    }
-
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // Update the camera
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-
-        batch.begin();
-        batch.draw(levelBackground, 0, 0, 640, 480); // Draw background to match viewport size
-        bird.render(batch);
-        bird2.render(batch);
-        pig.render(batch);
-        woodBlock.render(batch);
-        // Draw pause button
-        batch.draw(pauseButton, pauseButtonBounds.x, pauseButtonBounds.y, pauseButtonBounds.width, pauseButtonBounds.height);
-        float catapultX = bird.getX() + bird.getWidth() + 10; // Position catapult near bird
-        float catapultY = bird.getY();
-        batch.draw(catapult, catapultX, catapultY, 60, 70);
-        if (isPaused) {
-            // Draw quit and settings buttons if paused
-            batch.draw(quitButton, quitButtonBounds.x, quitButtonBounds.y, quitButtonBounds.width, quitButtonBounds.height);
-            batch.draw(settingsButton, settingsButtonBounds.x, settingsButtonBounds.y, settingsButtonBounds.width, settingsButtonBounds.height);
-        } else {
-            // Render game objects
-
+                for (int i = 0; i < birdBodies.length; i++) {
+                    if (body == birdBodies[i]) {
+                        birdBodies[i] = null;
+                    }
+                }
+            }
         }
 
-        batch.end();
+        // Actually destroy bodies
+        for (Body body : bodiesToRemove) {
+            world.destroyBody(body);
+        }
 
-        // Handle touch input with justTouched to register single clicks
+        bodiesToDestroy.clear();
+
+        // Handle bird reset timer
+        if (birdLaunched) {
+            launchTimer += TIME_STEP;
+            if (launchTimer >= RESET_TIME) {
+                birdLaunched = false;
+                launchTimer = 0;
+                if (currentBirdIndex < birdBodies.length) {
+                    resetBirdPosition();
+                }
+            }
+        }
+
+        // Check for game over due to all birds used
+        if (currentBirdIndex >= birdBodies.length && !birdLaunched) {
+            handleRemainingBirdsAndScore();
+        }
+
+        // Handle winning screen delay timer
+        boolean allPigsDead = true;
+
+        if (pigBody != null) {
+            allPigsDead = false;
+        }
+
+
+        if (allPigsDead && !showWinningScreen) {
+            if (winningScreenDelayTimer <= 0) {
+                winningScreenDelayTimer = WINNING_SCREEN_DELAY;
+            } else {
+                winningScreenDelayTimer -= TIME_STEP;
+                if (winningScreenDelayTimer <= 0) {
+                    showWinningScreen = true;
+                    isPaused = true; // Stop the game
+                }
+            }
+        }
+    }
+
+    private void resetBirdPosition() {
+        if (currentBirdIndex < birdBodies.length && birdBodies[currentBirdIndex] != null) {
+            // Reset to the raised position (0.25f above catapult)
+            birdBodies[currentBirdIndex].setTransform(
+                catapultPosition.x,
+                catapultPosition.y + 0.25f,
+                0
+            );
+            birdBodies[currentBirdIndex].setLinearVelocity(0, 0);
+            birdBodies[currentBirdIndex].setAngularVelocity(0);
+        }
+    }
+
+    private void handleInput() {
+        if (currentBirdIndex >= birdBodies.length || birdBodies[currentBirdIndex] == null) return;
+
+        Vector2 dragOrigin = catapultPosition.cpy().add(0, 0.25f);
+
+        if (Gdx.input.isTouched()) {
+            float touchX = Gdx.input.getX();
+            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
+            Vector2 touchPoint = new Vector2(touchX / PPM, touchY / PPM);
+
+            if (!isDragging && !birdLaunched &&
+                birdBodies[currentBirdIndex].getPosition().dst(touchPoint) < DRAG_RADIUS) {
+                isDragging = true;
+            }
+
+            if (isDragging) {
+                Vector2 displacement = touchPoint.cpy().sub(dragOrigin);
+                float maxLength = DRAG_RADIUS;
+                if (displacement.len() > maxLength) {
+                    displacement.setLength(maxLength);
+                }
+
+                rubberEnd.set(dragOrigin.cpy().add(displacement));
+
+                birdBodies[currentBirdIndex].setTransform(rubberEnd.x, rubberEnd.y, 0);
+                birdBodies[currentBirdIndex].setLinearVelocity(0, 0);
+            }
+        } else if (isDragging) {
+            launchBird();
+        }
+    }
+
+
+
+    private void drawTrajectoryPrediction() {
+        if (isDragging && !birdLaunched && currentBirdIndex < birdBodies.length) {
+            Vector2 dragOrigin = catapultPosition.cpy().add(0, 0.25f);
+            Vector2 releaseVector = dragOrigin.cpy().sub(rubberEnd);
+
+            float pullDistance = releaseVector.len();
+            float maxPullDistance = DRAG_RADIUS;
+            float launchForce = Math.min(10f, pullDistance * 2f);
+
+            // Normalize and scale the release vector
+            releaseVector.nor().scl(launchForce);
+
+            shapeRenderer.setProjectionMatrix(game.camera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(Color.WHITE);
+
+            // Initial conditions
+            Vector2 currentPos = rubberEnd.cpy();
+            Vector2 velocity = releaseVector.cpy();
+            Vector2 gravity = world.getGravity().cpy();
+
+            float timeStep = 1 / 60f;  // Smaller time step for smoother prediction
+            float totalSimTime = 2f;  // Limit prediction time
+            int maxPoints = 60;  // Limit number of trajectory points
+            float pointSpacing = totalSimTime / maxPoints;
+
+            // Store and draw trajectory points
+            for (int i = 0; i < maxPoints; i++) {
+                // Simulate physics for the next position
+                Vector2 nextPos = new Vector2(
+                    currentPos.x + velocity.x * timeStep,
+                    currentPos.y + velocity.y * timeStep + 0.5f * gravity.y * timeStep * timeStep
+                );
+
+
+                velocity.add(gravity.scl(timeStep));
+
+                shapeRenderer.circle(nextPos.x * PPM, nextPos.y * PPM, 2); // Small dot radius: 2
+
+                currentPos = nextPos;
+            }
+
+            shapeRenderer.end();
+        }
+    }
+
+
+
+
+    private void launchBird() {
+        Vector2 dragOrigin = catapultPosition.cpy().add(0, 0.25f);
+        Vector2 releaseVector = dragOrigin.cpy().sub(rubberEnd);
+
+        float pullDistance = releaseVector.len();
+        float launchForce = Math.min(4f, pullDistance * 2f);
+
+        releaseVector.nor().scl(launchForce);
+
+        birdBodies[currentBirdIndex].setLinearVelocity(0, 0);
+        birdBodies[currentBirdIndex].setAngularVelocity(0);
+        birdBodies[currentBirdIndex].applyLinearImpulse(
+            releaseVector,
+            birdBodies[currentBirdIndex].getWorldCenter(),
+            true
+        );
+
+        isDragging = false;
+        birdLaunched = true;
+        launchTimer = 0;
+
+        if (currentBirdIndex < birdBodies.length - 1) {
+            currentBirdIndex++;
+        } else if (currentBirdIndex == birdBodies.length - 1) {
+            currentBirdIndex++; // Move past the last bird to trigger exhaustion
+        }
+    }
+
+
+
+
+    private void handlePauseInput() {
         if (Gdx.input.justTouched()) {
-            // Convert screen coordinates to world coordinates once
-            touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            viewport.unproject(touchPoint);
+            Vector3 touch = game.viewport.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-            // Check if the touch is within the pause button's bounds
-            if (pauseButtonBounds.contains(touchPoint.x, touchPoint.y)) {
-                isPaused = !isPaused;  // Toggle pause state
-            }
-
-            // Check if quit button is clicked while paused
-            if (isPaused && quitButtonBounds.contains(touchPoint.x, touchPoint.y)) {
-                mainInstance.showLevelDisplayScreen = true; // Go back to level select
-                mainInstance.showLevel1 = false; // Exit Level_1
-            }
-        }
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height); // Update viewport to handle resizing
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        pauseButton.dispose();
-        quitButton.dispose();
-        settingsButton.dispose();
-        catapult.dispose();
-        bird.dispose();
-        bird2.dispose();
-        pig.dispose();
-        woodBlock.dispose();
-}
-}
-
-
-
-
-
-
-
-/*
-package io.github.some_example_name;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.badlogic.gdx.math.Vector3;
-
-public class Level_1 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private OrthographicCamera camera;    // Camera for world coordinates
-    private Viewport viewport;            // Viewport to handle resizing
-    private Texture levelBackground;
-    private Texture pauseButton;
-    private Texture quitButton;
-    private Texture settingsButton;
-    private Texture catapult;             // New catapult texture
-    private Rectangle pauseButtonBounds;
-    private Rectangle quitButtonBounds;
-    private Rectangle settingsButtonBounds;
-    private boolean isPaused;
-    private Main mainInstance;
-
-    private Bird bird;
-    private Bird bird2;
-    private Pig pig;
-    private Object woodBlock;
-
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
-    }
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-
-        // Set up camera and viewport for a 640x480 world size
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(640, 480, camera);
-        camera.position.set(320, 240, 0);  // Center the camera at (320, 240)
-        viewport.apply();
-
-        // Load textures
-        levelBackground = new Texture("insidelvle2.jpg");
-        pauseButton = new Texture("pause2.png");
-        quitButton = new Texture("quit1.png");
-        settingsButton = new Texture("settings.png");
-        catapult = new Texture("catapult2.png");
-
-        // Set button bounds in world coordinates
-        pauseButtonBounds = new Rectangle(50, 430, 50, 50);   // Position near the top-left corner
-        quitButtonBounds = new Rectangle(50, 370, 50, 50);    // Position below pause button
-        settingsButtonBounds = new Rectangle(50, 310, 50, 50); // Position below quit button
-
-        isPaused = false;
-
-        // Initialize game objects with world coordinates
-        bird = new Bird("bird.png", 70, 70, 25, 25);
-        bird2 = new Bird("bird2.png", 120, 127, 25, 25);
-        pig = new Pig("pig.png", 510, 70, 30, 40);
-        woodBlock = new Object("wood2.png", 480, 60, 80, 70);
-    }
-
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // Update the camera
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-
-        batch.begin();
-        batch.draw(levelBackground, 0, 0, 640, 480); // Draw background to match viewport size
-        bird.render(batch);
-        bird2.render(batch);
-        pig.render(batch);
-        woodBlock.render(batch);
-        // Draw pause button
-        batch.draw(pauseButton, pauseButtonBounds.x, pauseButtonBounds.y, pauseButtonBounds.width, pauseButtonBounds.height);
-        // Draw the catapult next to the bird
-        float catapultX = bird.getX() + bird.getWidth() + 10; // Position catapult near bird
-        float catapultY = bird.getY();
-        batch.draw(catapult, catapultX, catapultY, 60, 70);
-        if (isPaused) {
-            // Draw quit and settings buttons if paused
-            batch.draw(quitButton, quitButtonBounds.x, quitButtonBounds.y, quitButtonBounds.width, quitButtonBounds.height);
-            batch.draw(settingsButton, settingsButtonBounds.x, settingsButtonBounds.y, settingsButtonBounds.width, settingsButtonBounds.height);
-        } else {
-           //
-        }
-
-        batch.end();
-
-        if (Gdx.input.isTouched()) {
-            // Convert screen coordinates to world coordinates
-            float touchX = viewport.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0)).x;
-            float touchY = viewport.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0)).y;
-
-            if (pauseButtonBounds.contains(touchX, touchY)) {
-                isPaused = !isPaused;  // Toggle pause state
-            }
-
-            if (isPaused && quitButtonBounds.contains(touchX, touchY)) {
-                mainInstance.showLevelDisplayScreen = true; // Go back to level select
-                mainInstance.showLevel1 = false; // Exit Level_1
-            }
-        }
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height); // Update viewport to handle resizing
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        pauseButton.dispose();
-        quitButton.dispose();
-        settingsButton.dispose();
-        catapult.dispose();
-        bird.dispose();
-        bird2.dispose();
-        pig.dispose();
-        woodBlock.dispose();
-}
-}
-
-
-
-
-/*
-package io.github.some_example_name;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.badlogic.gdx.math.Vector3;
-
-public class Level_1 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private OrthographicCamera camera;
-    private Viewport viewport;
-    private Texture levelBackground;
-    private Texture pauseButton;
-    private Texture quitButton;
-    private Texture settingsButton;
-    private Texture catapult;
-    private Rectangle pauseButtonBounds;
-    private Rectangle quitButtonBounds;
-    private Rectangle settingsButtonBounds;
-    private boolean isPaused;
-    private Main mainInstance;
-
-    private Bird bird;
-    private Bird bird2;
-    private Pig pig;
-    private Object woodBlock;
-
-    private Vector3 touchPoint;  // Store the unprojected touch point
-
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
-    }
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-
-        // Set up camera and viewport for a 640x480 world size
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(640, 480, camera);
-        camera.position.set(320, 240, 0);
-        viewport.apply();
-
-        // Load textures
-        levelBackground = new Texture("insidelvle2.jpg");
-        pauseButton = new Texture("pause2.png");
-        quitButton = new Texture("quit1.png");
-        settingsButton = new Texture("settings.png");
-        catapult = new Texture("catapult2.png");
-
-        // Set button bounds in world coordinates
-        pauseButtonBounds = new Rectangle(50, 430, 50, 50);
-        quitButtonBounds = new Rectangle(50, 370, 50, 50);
-        settingsButtonBounds = new Rectangle(50, 310, 50, 50);
-
-        isPaused = false;
-
-        // Initialize game objects with world coordinates
-        bird = new Bird("bird.png", 70, 70, 25, 25);
-        bird2 = new Bird("bird2.png", 120, 127, 25, 25);
-        pig = new Pig("pig.png", 510, 70, 30, 40);
-        woodBlock = new Object("wood2.png", 480, 60, 80, 70);
-
-        touchPoint = new Vector3();  // Initialize the touchPoint for reuse
-    }
-
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // Update the camera
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-
-        batch.begin();
-        batch.draw(levelBackground, 0, 0, 640, 480);
-
-        // Draw pause button
-        batch.draw(pauseButton, pauseButtonBounds.x, pauseButtonBounds.y, pauseButtonBounds.width, pauseButtonBounds.height);
-
-        if (isPaused) {
-            // Draw quit and settings buttons if paused
-            batch.draw(quitButton, quitButtonBounds.x, quitButtonBounds.y, quitButtonBounds.width, quitButtonBounds.height);
-            batch.draw(settingsButton, settingsButtonBounds.x, settingsButtonBounds.y, settingsButtonBounds.width, settingsButtonBounds.height);
-        } else {
-            // Render game objects
-            bird.render(batch);
-            bird2.render(batch);
-            pig.render(batch);
-            woodBlock.render(batch);
-
-            // Draw the catapult next to the bird
-            float catapultX = bird.getX() + bird.getWidth() + 10;
-            float catapultY = bird.getY();
-            batch.draw(catapult, catapultX, catapultY, 60, 70);
-        }
-
-        batch.end();
-
-        // Handle touch input
-        if (Gdx.input.justTouched()) { // Use justTouched to ensure only one input is registered
-            // Convert screen coordinates to world coordinates once per touch
-            touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            viewport.unproject(touchPoint);
-
-            // Check if the touch is within the pause button's bounds
-            if (pauseButtonBounds.contains(touchPoint.x, touchPoint.y)) {
-                isPaused = !isPaused;  // Toggle pause state
-            }
-
-            // Check if quit button is clicked while paused
-            if (isPaused && quitButtonBounds.contains(touchPoint.x, touchPoint.y)) {
-                mainInstance.showLevelDisplayScreen = true;
-                mainInstance.showLevel1 = false;
-            }
-        }
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height);
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        pauseButton.dispose();
-        quitButton.dispose();
-        settingsButton.dispose();
-        catapult.dispose();
-        bird.dispose();
-        bird2.dispose();
-        pig.dispose();
-        woodBlock.dispose();
-}
-}
-
- */
-
-
-
-
-
-/*
-package io.github.some_example_name;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-
-public class Level_1 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture levelBackground;
-    private Texture pauseButton;
-    private Texture quitButton;
-    private Texture settingsButton;
-    private Texture catapult; // New catapult texture
-    private Rectangle pauseButtonBounds;
-    private Rectangle quitButtonBounds;
-    private Rectangle settingsButtonBounds;
-    private boolean isPaused;
-    private Main mainInstance;
-
-    private Bird bird;
-    private Bird bird2;
-    private Pig pig;
-    private Object woodBlock;
-
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
-    }
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-        levelBackground = new Texture("insidelvle2.jpg");
-        pauseButton = new Texture("pause2.png");
-        quitButton = new Texture("quit1.png");
-        settingsButton = new Texture("settings.png");
-        catapult = new Texture("catapult2.png"); // Load catapult texture
-
-        pauseButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 100, 50, 50);
-        quitButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 150, 50, 50);
-        settingsButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 200, 50, 50);
-
-        isPaused = false;
-
-        bird = new Bird("bird.png", 70, 70, 25, 25);
-        pig = new Pig("pig.png", 510, 70, 30, 40);
-        woodBlock = new Object("wood2.png", 480, 60, 80, 70);
-        bird2= new Bird("bird2.png",120, 127, 25 , 25 );
-    }
-
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        batch.begin();
-        batch.draw(levelBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.draw(pauseButton, pauseButtonBounds.x, pauseButtonBounds.y, pauseButtonBounds.width, pauseButtonBounds.height);
-
-        bird.render(batch);
-        pig.render(batch);
-        woodBlock.render(batch);
-        bird2.render(batch);
-        // Draw the catapult to the right of the bird
-        float catapultX = bird.getX() + bird.getWidth() + 10; // Adjust positioning
-        float catapultY = bird.getY();
-        batch.draw(catapult, catapultX, catapultY, 60, 70);
-
-        if (isPaused) {
-            batch.draw(quitButton, quitButtonBounds.x, quitButtonBounds.y, quitButtonBounds.width, quitButtonBounds.height);
-            batch.draw(settingsButton, settingsButtonBounds.x, settingsButtonBounds.y, settingsButtonBounds.width, settingsButtonBounds.height);
-        } else {
-
-
-          // Adjust size as needed
-        }
-
-        batch.end();
-
-        if (Gdx.input.isTouched()) {
-            float touchX = Gdx.input.getX();
-            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
-
-            if (pauseButtonBounds.contains(touchX, touchY)) {
+            if (pauseButtonBounds.contains(touch.x, touch.y)) {
                 isPaused = !isPaused;
-            }
-
-            if (isPaused && quitButtonBounds.contains(touchX, touchY)) {
-                mainInstance.showLevelDisplayScreen = true;
-                mainInstance.showLevel1 = false;
+                showQuitButton = isPaused;
+            } else if (showQuitButton && quitButtonBounds.contains(touch.x, touch.y)) {
+                // Navigate to the level selection screen
+                resetLevel();
+                game.currentLevel = 0;
+                game.showLevelDisplayScreen = true;
             }
         }
     }
 
-    @Override
-    public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        pauseButton.dispose();
-        quitButton.dispose();
-        settingsButton.dispose();
-        catapult.dispose(); // Dispose catapult texture
-        bird.dispose();
-        pig.dispose();
-        woodBlock.dispose();
-    }
-}
 
+    public void resetLevel() {
+        // Dispose of existing textures
+        disposeTextures();
 
+        // Clear physics bodies
+        Array<Body> bodies = new Array<>();
+        world.getBodies(bodies);
+        for (Body body : bodies) {
+            if (body != null) {
+                world.destroyBody(body);
+            }
+        }
 
+        // Clear arrays
+        bodiesToDestroy.clear();
 
-
-
-
-
-/*
-package io.github.some_example_name;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-
-public class Level_1 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture levelBackground;
-    private Texture pauseButton;
-    private Texture quitButton;
-    private Texture settingsButton;
-    private Texture catapult; // New catapult texture
-    private Rectangle pauseButtonBounds;
-    private Rectangle quitButtonBounds;
-    private Rectangle settingsButtonBounds;
-    private boolean isPaused;
-    private Main mainInstance;
-
-    private Bird bird;
-    private Bird bird2;
-    private Pig pig;
-    private Object woodBlock;
-
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
-    }
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-        levelBackground = new Texture("insidelvle2.jpg");
-        pauseButton = new Texture("pause1.png");
-        quitButton = new Texture("quit1.png");
-        settingsButton = new Texture("settings.png");
-        catapult = new Texture("catapult2.png"); // Load catapult texture
-
-        pauseButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 100, 50, 50);
-        quitButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 150, 50, 50);
-        settingsButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 200, 50, 50);
-
+        // Reset game state
+        currentBirdIndex = 0;
+        isDragging = false;
+        birdLaunched = false;
+        launchTimer = 0;
         isPaused = false;
+        score = 0;
+        showQuitButton = false;
+        showEndScreen = false;
+        showWinningScreen = false;
+        showLosingScreen = false;
 
-        bird = new Bird("bird.png", 70, 70, 25, 25);
-        pig = new Pig("pig.png", 510, 70, 30, 40);
-        woodBlock = new Object("wood2.png", 480, 60, 80, 70);
-        bird2= new Bird("bird2.png",120, 127, 25 , 25 );
+        // Recreate game objects and textures
+        world.dispose();
+        world = new World(new Vector2(0, -9.81f), true);
+        world.setContactListener(createContactListener());
+        createGround();
+        createBirds();
+        createBlocks();
+        createPig();
+
+        backgroundTexture = new Texture("insidelvle2.jpg");
+        catapultTexture = new Texture("catapult2.png");
+        bird2Texture = new Texture("bird2.png");
+        blockTexture = new Texture("wb1.png");
+        blockHorizontalTexture = new Texture("wbh.png");
+        pauseButtonTexture = new Texture("pse.png");
+        quitButtonTexture = new Texture("quit1.png");
+        pigTexture = new Texture("pig.png");
+        winningScreenTexture = new Texture("winning.png");
+        losingScreenTexture = new Texture("losing.png");
+        homeButtonTexture = new Texture("home.png");
+        playAgainButtonTexture = new Texture("retry.png");
     }
 
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.begin();
-        batch.draw(levelBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.draw(pauseButton, pauseButtonBounds.x, pauseButtonBounds.y, pauseButtonBounds.width, pauseButtonBounds.height);
-
-        if (isPaused) {
-            batch.draw(quitButton, quitButtonBounds.x, quitButtonBounds.y, quitButtonBounds.width, quitButtonBounds.height);
-            batch.draw(settingsButton, settingsButtonBounds.x, settingsButtonBounds.y, settingsButtonBounds.width, settingsButtonBounds.height);
-        } else {
-            bird.render(batch);
-            pig.render(batch);
-            woodBlock.render(batch);
-            bird2.render(batch);
-
-            // Draw the catapult to the right of the bird
-            float catapultX = bird.getX() + bird.getWidth() + 10; // Adjust positioning
-            float catapultY = bird.getY();
-            batch.draw(catapult, catapultX, catapultY, 60, 70); // Adjust size as needed
-        }
-
-        batch.end();
-
-        if (Gdx.input.isTouched()) {
-            float touchX = Gdx.input.getX();
-            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
-
-            if (pauseButtonBounds.contains(touchX, touchY)) {
-                isPaused = !isPaused;
-            }
-
-            if (isPaused && quitButtonBounds.contains(touchX, touchY)) {
-                mainInstance.showLevelDisplayScreen = true;
-                mainInstance.showLevel1 = false;
-            }
-        }
+    // Add this new method to dispose of existing textures before reloading
+    private void disposeTextures() {
+        if (backgroundTexture != null) backgroundTexture.dispose();
+        if (catapultTexture != null) catapultTexture.dispose();
+//        if (birdTexture != null) birdTexture.dispose();
+        if (bird2Texture != null) bird2Texture.dispose();
+        if (blockTexture != null) blockTexture.dispose();
+        if (pauseButtonTexture != null) pauseButtonTexture.dispose();
+        if (quitButtonTexture != null) quitButtonTexture.dispose();
+        if (pigTexture != null) pigTexture.dispose();
+        if (winningScreenTexture != null) winningScreenTexture.dispose();
+        if (losingScreenTexture != null) losingScreenTexture.dispose();
+        if (homeButtonTexture != null) homeButtonTexture.dispose();
+        if (playAgainButtonTexture != null) playAgainButtonTexture.dispose();
     }
 
-    @Override
+
+
     public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        pauseButton.dispose();
-        quitButton.dispose();
-        settingsButton.dispose();
-        catapult.dispose(); // Dispose catapult texture
-        bird.dispose();
-        pig.dispose();
-        woodBlock.dispose();
+        // Dispose of physics world and renderers
+        if (world != null) world.dispose();
+        if (debugRenderer != null) debugRenderer.dispose();
+        if (batch != null) batch.dispose();
+        if (shapeRenderer != null) shapeRenderer.dispose();
+        if (scoreFont != null) scoreFont.dispose();
+
+        // Dispose of textures
+        disposeTextures();
     }
+
 }
-
-
-
-
-
-
-
-/*
-
-
-
-package io.github.some_example_name;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-
-public class Level_1 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture levelBackground;
-    private Texture pauseButton;
-    private Texture quitButton;
-    private Texture settingsButton;
-    private Rectangle pauseButtonBounds;
-    private Rectangle quitButtonBounds;
-    private Rectangle settingsButtonBounds;
-    private boolean isPaused;
-    private Main mainInstance;
-
-    private Bird bird;
-    private Pig pig;
-    private Object woodBlock;
-
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
-    }
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-        levelBackground = new Texture("insidelvle2.jpg");
-        pauseButton = new Texture("pause1.png");
-        quitButton = new Texture("quit1.png");
-        settingsButton = new Texture("settings.png");
-
-        pauseButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 100, 50, 50);
-        quitButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 150, 50, 50);
-        settingsButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 200, 50, 50);
-
-        isPaused = false;
-
-        bird = new Bird("bird.png", 70, 70, 30, 30);
-        pig = new Pig("pig.png", 500, 110, 30, 30);
-        woodBlock = new Object("wood.jpg", 480, 60, 70, 50);
-    }
-
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        batch.begin();
-        batch.draw(levelBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.draw(pauseButton, pauseButtonBounds.x, pauseButtonBounds.y, pauseButtonBounds.width, pauseButtonBounds.height);
-
-        if (isPaused) {
-            batch.draw(quitButton, quitButtonBounds.x, quitButtonBounds.y, quitButtonBounds.width, quitButtonBounds.height);
-            batch.draw(settingsButton, settingsButtonBounds.x, settingsButtonBounds.y, settingsButtonBounds.width, settingsButtonBounds.height);
-        } else {
-            bird.render(batch);
-            pig.render(batch);
-            woodBlock.render(batch);
-        }
-
-        batch.end();
-
-        if (Gdx.input.isTouched()) {
-            float touchX = Gdx.input.getX();
-            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
-
-            if (pauseButtonBounds.contains(touchX, touchY)) {
-                isPaused = !isPaused;
-            }
-
-            if (isPaused && quitButtonBounds.contains(touchX, touchY)) {
-                mainInstance.showLevelDisplayScreen = true;
-                mainInstance.showLevel1 = false;
-            }
-        }
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        pauseButton.dispose();
-        quitButton.dispose();
-        settingsButton.dispose();
-        bird.dispose();
-        pig.dispose();
-        woodBlock.dispose();
-    }
-}
-
-
- */
-
-
-
-
-/*package io.github.some_example_name;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-
-public class Level_1 extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture levelBackground;
-    private Texture pauseButton;
-    private Texture quitButton;
-    private Texture settingsButton;
-    private Rectangle pauseButtonBounds;
-    private Rectangle quitButtonBounds;
-    private Rectangle settingsButtonBounds;
-    private boolean isPaused;
-
-    private Main mainInstance; // Reference to Main class for screen transitions
-
-    public Level_1(Main mainInstance) {
-        this.mainInstance = mainInstance;
-    }
-
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-        levelBackground = new Texture("insidelvle.png");
-        pauseButton = new Texture("pause1.png");
-        quitButton = new Texture("quit1.png");
-        settingsButton = new Texture("settings.png");
-
-        pauseButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 100, 50, 50);
-        quitButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 150, 50, 50);
-        settingsButtonBounds = new Rectangle(50, Gdx.graphics.getHeight() - 200, 50, 50);
-
-        isPaused = false;
-    }
-
-    @Override
-    public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        batch.begin();
-        batch.draw(levelBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.draw(pauseButton, pauseButtonBounds.x, pauseButtonBounds.y, pauseButtonBounds.width, pauseButtonBounds.height);
-
-        if (isPaused) {
-            batch.draw(quitButton, quitButtonBounds.x, quitButtonBounds.y, quitButtonBounds.width, quitButtonBounds.height);
-            batch.draw(settingsButton, settingsButtonBounds.x, settingsButtonBounds.y, settingsButtonBounds.width, settingsButtonBounds.height);
-        }
-
-        batch.end();
-
-        if (Gdx.input.isTouched()) {
-            float touchX = Gdx.input.getX();
-            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
-
-            if (pauseButtonBounds.contains(touchX, touchY)) {
-                isPaused = !isPaused;
-            }
-
-            if (isPaused && quitButtonBounds.contains(touchX, touchY)) {
-                mainInstance.showLevelDisplayScreen = true; // Return to level display screen
-                mainInstance.showLevel1 = false; // Exit Level_1
-            }
-        }
-
-
-    }
-
-    @Override
-    public void dispose() {
-        batch.dispose();
-        levelBackground.dispose();
-        pauseButton.dispose();
-        quitButton.dispose();
-        settingsButton.dispose();
-    }
-}
-*/

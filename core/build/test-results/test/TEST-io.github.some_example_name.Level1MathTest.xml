@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="io.github.some_example_name.Level1MathTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-11-29T13:50:55" hostname="danish-ASUS-TUF-Gaming-A15-FA507XU-FA507XU" time="0.003">
+  <properties/>
+  <testcase name="testLaunchForceCalculation" classname="io.github.some_example_name.Level1MathTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
